@@ -1,0 +1,6 @@
+#Ignoro los ejecutables que vaya creando del proyecto
+*.o
+#Como uso emacs tambien ignoro los archivos temporales que va guardando
+*~
+
+
