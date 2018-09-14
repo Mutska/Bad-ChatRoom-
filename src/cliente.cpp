@@ -17,6 +17,10 @@ using namespace std;
 int main(){
   stringstream reloaded;
   string testing;
+  //Mensaje de prueba para enviar al servidor
+  char msg[10000] = "Mensaje de prueba por parte del cliente";
+  reloaded.str(msg);
+  testing  = reloaded.str();
   //Esta variable almacenara al descriptor de archivo(File Descriptor) del  el cliente
   int client_socket;
   //Estas son las estructuras que corresponden al servidor y al cliente, las cuales hay que configurar
@@ -44,16 +48,20 @@ int main(){
     printf("El cliente no se pudo conectar");
 
   }
-  //Esta funncion recibe el mensaje del servidor y lo guarda en la variable server_response
+  //Esta funcion recibe el mensaje del servidor y lo guarda en la variable server_response
   recv(client_socket,&server_response,sizeof(server_response),0);
   reloaded.str(server_response);
   testing  = reloaded.str();
-  //Imprime el mensaje del servidor
-  cout<<testing<<endl;
+  
+  //Imprime el mensaje del servidor con la conversion de char[] al tipo string
+  cout<<"El servidor envia el siguiente mensaje: "<<testing<<endl;
+
+  //Envia un mensaje al servidor
+  send(client_socket,msg,sizeof(msg),0);
+  
   //Cerramos el socket del cliente
   close(client_socket);
-  
-  
+   
 
   return 0;
 

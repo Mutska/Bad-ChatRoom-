@@ -15,8 +15,9 @@ using namespace std;
 int main(){
   stringstream reloaded;
   string testing;
-  //Mensaje de prueba para enviar al servidor
-  char msg[10000] = "Mensaje de prueba";
+  //Mensaje de prueba para enviar al cliente
+  char msg[10000] = "Mensaje de prueba por parte del servidor";
+  char client_response[10000];
   reloaded.str(msg);
   testing  = reloaded.str();
   int server_socket,client_socket;
@@ -50,13 +51,17 @@ int main(){
   cout<<"Servidor iniciado en: "<<inet_ntoa(server_info.sin_addr)<<":"<<ntohs(server_info.sin_port)<<endl;
   
   //Si hay conexion se acepta
-  client_socket = accept(server_socket,NULL,NULL);
+  client_socket = accept(server_socket,(struct sockaddr*) &client_info, (socklen_t*) &client_space);
   
   //Y se envia un mensaje al cliente
   send(client_socket,msg,sizeof(msg),0);
 
-  //Testeando la conversion de un tipo char[] a string
-  cout<<"El servidor envio el siguiente mensaje: "<<testing<<endl;
+  //Se recibe un mensaje del cliente
+  recv(client_socket,&client_response,sizeof(client_response),0);
+  reloaded.str(client_response);
+  testing  = reloaded.str();
+  //Testeando la conversion de un tipo char[] a string con el mensaje del cliente
+  cout<<"El cliente envio el siguiente mensaje: "<<testing<<endl;
 
   //Cerrar el servidor
   close(server_socket);
