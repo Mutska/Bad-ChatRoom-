@@ -17,6 +17,7 @@ using namespace std;
 int main(){
   stringstream reloaded;
   string testing;
+  string flag;
   //Mensaje de prueba para enviar al servidor
   char msg[10000] = "Mensaje de prueba por parte del cliente";
   reloaded.str(msg);
@@ -48,6 +49,7 @@ int main(){
     printf("El cliente no se pudo conectar");
 
   }
+  while(1){
   //Esta funcion recibe el mensaje del servidor y lo guarda en la variable server_response
   recv(client_socket,&server_response,sizeof(server_response),0);
   reloaded.str(server_response);
@@ -58,10 +60,15 @@ int main(){
 
   //Envia un mensaje al servidor
   send(client_socket,msg,sizeof(msg),0);
+  cout<<"Quieres continuar el ciclo?(y/n): "<<endl;
+  cin>>flag;
+  if(flag == "n")
+    break;
+  }
   
   //Cerramos el socket del cliente
   close(client_socket);
-   
+ 
 
   return 0;
 

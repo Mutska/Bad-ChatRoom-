@@ -11,7 +11,13 @@
 #include <pthread.h>
 #include <iostream>
 #include <sstream>
+#include <map>
+#include "Usuario.h"
+
 using namespace std;
+Usuario* temporal;
+map<string,Usuario*> list;
+
 int main(){
   stringstream reloaded;
   string testing;
@@ -52,7 +58,7 @@ int main(){
   
   //Si hay conexion se acepta
   client_socket = accept(server_socket,(struct sockaddr*) &client_info, (socklen_t*) &client_space);
-  
+  while(1){
   //Y se envia un mensaje al cliente
   send(client_socket,msg,sizeof(msg),0);
 
@@ -62,7 +68,7 @@ int main(){
   testing  = reloaded.str();
   //Testeando la conversion de un tipo char[] a string con el mensaje del cliente
   cout<<"El cliente envio el siguiente mensaje: "<<testing<<endl;
-
+  }
   //Cerrar el servidor
   close(server_socket);
   return 0;
