@@ -49,6 +49,10 @@ int main(){
     printf("El cliente no se pudo conectar");
 
   }
+  //Mensajes de prueba para comprobacion de los comandos
+  char correcto[1000] = "IDENTIFY MARKOS";
+  char incorrecto[1000] = "IDENTIFYMUTSKA";
+
   while(1){
   //Esta funcion recibe el mensaje del servidor y lo guarda en la variable server_response
   recv(client_socket,&server_response,sizeof(server_response),0);
@@ -57,15 +61,19 @@ int main(){
   
   //Imprime el mensaje del servidor con la conversion de char[] al tipo string
   cout<<"El servidor envia el siguiente mensaje: "<<testing<<endl;
-
-  //Envia un mensaje al servidor
-  send(client_socket,msg,sizeof(msg),0);
+  
+  //Mandando mensaje personalizado en tiempo real;
+  send(client_socket,correcto,sizeof(correcto),0);
+  recv(client_socket,&server_response,sizeof(server_response),0);
+  reloaded.str(server_response);
+  testing  = reloaded.str();
+  cout<<"El servidor envia el siguiente mensaje: "<<testing<<endl;  
   cout<<"Quieres continuar el ciclo?(y/n): "<<endl;
   cin>>flag;
   if(flag == "n")
     break;
   }
-  
+
   //Cerramos el socket del cliente
   close(client_socket);
  

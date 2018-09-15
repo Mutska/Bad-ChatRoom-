@@ -13,7 +13,7 @@
 #include <sstream>
 #include <map>
 #include "Usuario.h"
-
+#include "Auxiliares.h"
 using namespace std;
 Usuario* temporal;
 map<string,Usuario*> list;
@@ -22,7 +22,7 @@ int main(){
   stringstream reloaded;
   string testing;
   //Mensaje de prueba para enviar al cliente
-  char msg[10000] = "Mensaje de prueba por parte del servidor";
+  char msg[10000] = "Introduce tu nombre por favor";
   char client_response[10000];
   reloaded.str(msg);
   testing  = reloaded.str();
@@ -55,19 +55,48 @@ int main(){
   
   //Imprime la ip del servidor
   cout<<"Servidor iniciado en: "<<inet_ntoa(server_info.sin_addr)<<":"<<ntohs(server_info.sin_port)<<endl;
+
+  //Se agrega el servidor como primer elemento en el diccionario(test)
+  list["Server"]  = newNode(server_socket, inet_ntoa(server_info.sin_addr),"Server");
   
   //Si hay conexion se acepta
   client_socket = accept(server_socket,(struct sockaddr*) &client_info, (socklen_t*) &client_space);
+  //Variables necesarias para probar la veracidad el comando que el cliente conectado introduce
+  size_t found;
+  string name;
+  string need = "IDENTIFY ";
+  char error[256] = "EL comando que introduciste es incorrecto vuelve a conectarde.. adios :V";
+  char happy[256] = "Felicidades introduciste tu comando perfectamente";
   while(1){
-  //Y se envia un mensaje al cliente
-  send(client_socket,msg,sizeof(msg),0);
-
-  //Se recibe un mensaje del cliente
-  recv(client_socket,&client_response,sizeof(client_response),0);
-  reloaded.str(client_response);
-  testing  = reloaded.str();
-  //Testeando la conversion de un tipo char[] a string con el mensaje del cliente
-  cout<<"El cliente envio el siguiente mensaje: "<<testing<<endl;
+    // Imprime el ip del cliente que entra
+    getpeername(client_socket, (struct sockaddr*) &client_info, (socklen_t*) &client_space);
+    cout<<"Cliente "<<inet_ntoa(client_info.sin_addr)<<":"<<ntohs(client_info.sin_port)<<"."<<endl;
+    
+    //Y se envia un mensaje al cliente
+    send(client_socket,msg,sizeof(msg),0);
+    
+    //Se recibe un mensaje del cliente
+    recv(client_socket,&client_response,sizeof(client_response),0);
+    reloaded.str(client_response);
+    testing  = reloaded.str();
+    found = testing.find(need);
+    if(found != std::string::npos){
+      send(client_socket,happy,sizeof(happy),0);
+    }else{
+      send(client_socket,error,sizeof(error),0);
+      cout<<"Servidor cerrandose ante agresividad del cliente :("<<endl;
+      break;
+    }
+    cout<<"Testing es: "<<testing<<endl;
+    name = testing.substr(found+9);
+    
+    //guardamos el nuevo cliente si es que pasa la prueba del nombre
+    temporal = newNode(client_socket, inet_ntoa(client_info.sin_addr),name);
+    list[name] = temporal;
+    
+    //Testeando la conversion de un tipo char[] a string con el mensaje del cliente
+    cout<<"El cliente envio su nombre: "<<name<<endl;
+    
   }
   //Cerrar el servidor
   close(server_socket);
