@@ -13,6 +13,17 @@
 #include <sstream>
 using namespace std;
 
+//Esta funcion me ayuda a sacar los caracteres nulos o saltos de linea de un arreglo de caracteres
+void trimm (char* arr, int length) {
+    int i;
+    for (i = 0; i < length; i++) { 
+        if (arr[i] == '\n') {
+            arr[i] = '\0';
+            break;
+        }
+    }
+}
+
 
 int main(){
   stringstream reloaded;
@@ -40,7 +51,7 @@ int main(){
   memset(&client_info,0,client_space);
   //Configuramos las estructura del servidor 
   server_info.sin_family = AF_INET;
-  server_info.sin_addr.s_addr = inet_addr("192.168.0.13");
+  server_info.sin_addr.s_addr = inet_addr("192.168.15.8");
   server_info.sin_port = htons(8080);
   
   connection_status =  connect(client_socket,(struct sockaddr *) &server_info,sizeof(server_info));
@@ -50,7 +61,7 @@ int main(){
 
   }
   //Mensajes de prueba para comprobacion de los comandos
-  char correcto[1000] = "IDENTIFY MARKOS";
+  char name[1000] = {};
   char incorrecto[1000] = "IDENTIFYMUTSKA";
 
   while(1){
@@ -61,9 +72,12 @@ int main(){
   
   //Imprime el mensaje del servidor con la conversion de char[] al tipo string
   cout<<"El servidor envia el siguiente mensaje: "<<testing<<endl;
+  fgets(name, 500, stdin);
+  trimm(name, 500);
+
   
   //Mandando mensaje personalizado en tiempo real;
-  send(client_socket,correcto,sizeof(correcto),0);
+  send(client_socket,name,sizeof(name),0);
   recv(client_socket,&server_response,sizeof(server_response),0);
   reloaded.str(server_response);
   testing  = reloaded.str();

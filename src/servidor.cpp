@@ -22,7 +22,7 @@ int main(){
   stringstream reloaded;
   string testing;
   //Mensaje de prueba para enviar al cliente
-  char msg[10000] = "Introduce tu nombre por favor";
+  char msg[10000] = "Identificate por favor";
   char client_response[10000];
   reloaded.str(msg);
   testing  = reloaded.str();
@@ -44,7 +44,7 @@ int main(){
   
   //Configuramos las estructura del servidor 
   server_info.sin_family = AF_INET;
-  server_info.sin_addr.s_addr = inet_addr("192.168.0.13");
+  server_info.sin_addr.s_addr = inet_addr("192.168.15.8");
   server_info.sin_port = htons(8080);
 
   //Hacemos un bind para reservar el puerto que pensamos ocupar para el servidor
@@ -66,7 +66,6 @@ int main(){
   string name;
   string need = "IDENTIFY ";
   char error[256] = "EL comando que introduciste es incorrecto vuelve a conectarde.. adios :V";
-  char happy[256] = "Felicidades introduciste tu comando perfectamente";
   while(1){
     // Imprime el ip del cliente que entra
     getpeername(client_socket, (struct sockaddr*) &client_info, (socklen_t*) &client_space);
@@ -81,7 +80,7 @@ int main(){
     testing  = reloaded.str();
     found = testing.find(need);
     if(found != std::string::npos){
-      send(client_socket,happy,sizeof(happy),0);
+      name = testing.substr(found+9);
     }else{
       send(client_socket,error,sizeof(error),0);
       cout<<"Servidor cerrandose ante agresividad del cliente :("<<endl;
