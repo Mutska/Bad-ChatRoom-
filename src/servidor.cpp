@@ -19,13 +19,15 @@ Usuario* temporal;
 map<string,Usuario*> list;
 
 int main(){
-  stringstream reloaded;
-  string testing;
+  //Este tipo de variable me ayuda a guardar las cadenas de estilo c
+  stringstream stream;
+  //Esta variable me ayudara a hacer operaciones sobre los comandos recibidos
+  string cadena;
   //Mensaje de prueba para enviar al cliente
   char msg[10000] = "Identificate por favor";
   char client_response[10000];
-  reloaded.str(msg);
-  testing  = reloaded.str();
+  stream.str(msg);
+  cadena  = stream.str();
   int server_socket,client_socket;
   //Estas son las estructuras que corresponden al servidor y al cliente, las cuales hay que configurar
   struct sockaddr_in server_info,client_info;
@@ -69,33 +71,28 @@ int main(){
   while(1){
     // Imprime el ip del cliente que entra
     getpeername(client_socket, (struct sockaddr*) &client_info, (socklen_t*) &client_space);
-    cout<<"Cliente "<<inet_ntoa(client_info.sin_addr)<<":"<<ntohs(client_info.sin_port)<<"."<<endl;
+    cout<<"Cliente "<<inet_ntoa(client_info.sin_addr)<<":"<<ntohs(client_info.sin_port)<<"."<<"Entrando"<<endl;
     
     //Y se envia un mensaje al cliente
     send(client_socket,msg,sizeof(msg),0);
     
     //Se recibe un mensaje del cliente
     recv(client_socket,&client_response,sizeof(client_response),0);
-    reloaded.str(client_response);
-    testing  = reloaded.str();
-    found = testing.find(need);
+    stream.str(client_response);
+    cadena  = stream.str();
+    found = cadena.find(need);
     if(found != std::string::npos){
-      name = testing.substr(found+9);
+      name = cadena.substr(found+9);
+      cout<<"El cliente envio su nombre: "<<name<<endl;
     }else{
       send(client_socket,error,sizeof(error),0);
       cout<<"Servidor cerrandose ante agresividad del cliente :("<<endl;
       break;
     }
-    cout<<"Testing es: "<<testing<<endl;
-    name = testing.substr(found+9);
-    
+    name = cadena.substr(found+9);
     //guardamos el nuevo cliente si es que pasa la prueba del nombre
     temporal = newNode(client_socket, inet_ntoa(client_info.sin_addr),name);
-    list[name] = temporal;
-    
-    //Testeando la conversion de un tipo char[] a string con el mensaje del cliente
-    cout<<"El cliente envio su nombre: "<<name<<endl;
-    
+    list[name] = temporal;    
   }
   //Cerrar el servidor
   close(server_socket);

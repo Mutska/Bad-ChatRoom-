@@ -13,7 +13,7 @@
 #include <sstream>
 using namespace std;
 
-//Esta funcion me ayuda a sacar los caracteres nulos o saltos de linea de un arreglo de caracteres
+//Esta funcion me ayuda a sacar los saltos de linea de un arreglo de caracteres
 void trimm (char* arr, int length) {
     int i;
     for (i = 0; i < length; i++) { 
@@ -26,13 +26,13 @@ void trimm (char* arr, int length) {
 
 
 int main(){
-  stringstream reloaded;
-  string testing;
+  stringstream stream;
+  string cadena;
   string flag;
   //Mensaje de prueba para enviar al servidor
   char msg[10000] = "Mensaje de prueba por parte del cliente";
-  reloaded.str(msg);
-  testing  = reloaded.str();
+  stream.str(msg);
+  cadena  = stream.str();
   //Esta variable almacenara al descriptor de archivo(File Descriptor) del  el cliente
   int client_socket;
   //Estas son las estructuras que corresponden al servidor y al cliente, las cuales hay que configurar
@@ -67,11 +67,11 @@ int main(){
   while(1){
   //Esta funcion recibe el mensaje del servidor y lo guarda en la variable server_response
   recv(client_socket,&server_response,sizeof(server_response),0);
-  reloaded.str(server_response);
-  testing  = reloaded.str();
+  stream.str(server_response);
+  cadena  = stream.str();
   
   //Imprime el mensaje del servidor con la conversion de char[] al tipo string
-  cout<<"El servidor envia el siguiente mensaje: "<<testing<<endl;
+  cout<<"El servidor envia el siguiente mensaje: "<<cadena<<endl;
   fgets(name, 500, stdin);
   trimm(name, 500);
 
@@ -79,9 +79,9 @@ int main(){
   //Mandando mensaje personalizado en tiempo real;
   send(client_socket,name,sizeof(name),0);
   recv(client_socket,&server_response,sizeof(server_response),0);
-  reloaded.str(server_response);
-  testing  = reloaded.str();
-  cout<<"El servidor envia el siguiente mensaje: "<<testing<<endl;  
+  stream.str(server_response);
+  cadena  = stream.str();
+  cout<<"El servidor envia el siguiente mensaje: "<<cadena<<endl;  
   cout<<"Quieres continuar el ciclo?(y/n): "<<endl;
   cin>>flag;
   if(flag == "n")
