@@ -26,7 +26,7 @@ int main(){
   string cadena;
   //Mensaje de prueba para enviar al cliente
   char msg[10000] = "Identificate por favor";
-  char client_response[10000];
+  char client_response[256000];
   stream.str(msg);
   cadena  = stream.str();
   int server_socket,client_socket;
@@ -47,7 +47,7 @@ int main(){
   
   //Configuramos las estructura del servidor 
   server_info.sin_family = AF_INET;
-  server_info.sin_addr.s_addr = inet_addr("192.168.15.8");
+  server_info.sin_addr.s_addr = inet_addr("10.4.26.98");
   server_info.sin_port = htons(8080);
 
   //Hacemos un bind para reservar el puerto que pensamos ocupar para el servidor
@@ -124,8 +124,8 @@ void get_out(int sig) {
 void manager(void *client) {   //el parametro p_client es la direccion de p_client por eso le precede un puntero void
   int flag = 0;
   char nickname[50] = {};
-  char recv_buffer[1000] = {};
-  char send_buffer[1000] = {};
+  char recv_buffer[250000] = {};
+  char send_buffer[250000] = {};
   Usuario *cliente = (Usuario *)client;
     // Ciclo  que esta pendiente a las solicitudes del cliente, esta sera la funcion mas importante del servidor
   int receive;
