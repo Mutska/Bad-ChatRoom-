@@ -17,7 +17,8 @@
 using namespace std;
 Usuario* temporal;
 map<string,Usuario*> list;
-
+void get_out(int signal);
+void manager(void *);
 int main(){
   //Este tipo de variable me ayuda a guardar las cadenas de estilo c
   stringstream stream;
@@ -97,6 +98,57 @@ int main(){
   //Cerrar el servidor
   close(server_socket);
   return 0;
+}
+
+//Esta funcion es para  cuando te sales de la sala, libera la memoria  y cierra el socket de cada cliente  con su int data
+void get_out(int sig) {
+  Usuario *tmp;
+  for (map<std::string,Usuario*>::iterator it = list.begin(); it!=list.end(); ++it){
+    close(it->second->data);
+    tmp = it->second;
+    delete tmp;
+  }
+  cout<<endl<<"Cerrando servidor"<<endl;
+  exit(EXIT_SUCCESS);
+}
+
+
+//Manejador del cliente 
+void manager(void *client) {   //el parametro p_client es la direccion de p_client por eso le precede un puntero void
+  int flag = 0;
+  char nickname[50] = {};
+  char recv_buffer[1000] = {};
+  char send_buffer[1000] = {};
+  Usuario *cliente = (Usuario *)client;
+    // Ciclo  que esta pendiente a las solicitudes del cliente, esta sera la funcion mas importante del servidor
+  int receive;
+  while (1) {
+    if (flag) {//si esta activada la bandera el servidor cierra
+      break;
+    }
+    receive = recv(cliente->data, recv_buffer,1000, 0);
+    if (receive > 0) {
+      if (strlen(recv_buffer) == 0) {
+	continue;
+      }
+      sprintf(nickname, "%s" ,cliente->name.c_str());
+      trimm(nickname, 50);
+      strcpy(send_buffer,"");
+      sprintf(send_buffer, "%s：%s" , nickname, recv_buffer);
+    } else if (receive == 0) {
+      cout<<cliente->name<<"("<<cliente->ip<<")"<<"("<<cliente->data<<")"<<" dejo el chat"<<endl;
+      sprintf(send_buffer, "%s(%s) dejo el chat.", nickname, cliente->ip);
+      flag = 1;
+    } else {
+      cout<<"Error :("<<endl;
+      flag = 1;
+    }
+    send_to_all(list,cliente, send_buffer);
+  }
+  // Cuando termina el cliente se cierra su "FILE DESCRIPTOR" y lo elimina del diccionario
+  close(cliente->data);
+  list.erase(cliente->name);
+  delete cliente;
 }
 
 
