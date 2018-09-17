@@ -12,18 +12,13 @@
 #include <string>
 #include <sstream>
 using namespace std;
+//Prototipos de funciones
+void msg_sender();
+void msg_receiver();
+void trimm(char *,int);
 
-//Esta funcion me ayuda a sacar los saltos de linea de un arreglo de caracteres
-void trimm (char* arr, int length) {
-    int i;
-    for (i = 0; i < length; i++) { 
-        if (arr[i] == '\n') {
-            arr[i] = '\0';
-            break;
-        }
-    }
-}
-
+//Esta variable almacenara al descriptor de archivo(File Descriptor) del  el cliente
+int client_socket;
 
 int main(){
   stringstream stream;
@@ -33,8 +28,6 @@ int main(){
   char msg[10000] = "Mensaje de prueba por parte del cliente";
   stream.str(msg);
   cadena  = stream.str();
-  //Esta variable almacenara al descriptor de archivo(File Descriptor) del  el cliente
-  int client_socket;
   //Estas son las estructuras que corresponden al servidor y al cliente, las cuales hay que configurar
   struct sockaddr_in server_info,client_info;
   //Estas variables guardan la cantidad de memoria necesaria que se debe reservar para el cliente y el servidor.
@@ -95,3 +88,48 @@ int main(){
   return 0;
 
 }
+
+//Esta funcion se encarga de recibir msg del socket del cliente
+void msg_receiver() {
+  char receiveMessage[1000] = {};
+  int receive;
+  while (1) {
+    receive = recv(client_socket, receiveMessage, 1000, 0);
+    if (receive > 0) {
+      printf("\r%s\n", receiveMessage);
+    } else if (receive == 0) {
+      break;
+    } else { 
+      //Nada que hacer aqui
+    }
+  }
+}
+
+//Esta funcion se encargar de mandar msg por parte del cliente
+void msg_sender() {
+  char message[500] = {};
+  while (1) {
+    while (fgets(message, 500, stdin) != NULL) {
+      trimm(message, 500);
+      if (strlen(message) == 0) {
+	cout<<"No escribiste nada";
+      } else {
+	break;
+      }
+    }
+    send(client_socket, message, 500, 0);
+  }
+}
+
+  
+  //Esta funcion me ayuda a sacar los saltos de linea de un arreglo de caracteres de c
+  void trimm (char* arr, int length) {
+    int i;
+    for (i = 0; i < length; i++) { 
+      if (arr[i] == '\n') {
+	arr[i] = '\0';
+	break;
+      }
+    }
+  }
+  
