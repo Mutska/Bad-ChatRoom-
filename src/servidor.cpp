@@ -62,14 +62,14 @@ int main(){
   //Se agrega el servidor como primer elemento en el diccionario(test)
   list["Server"]  = newNode(server_socket, inet_ntoa(server_info.sin_addr),"Server");
   
-  //Si hay conexion se acepta
-  client_socket = accept(server_socket,(struct sockaddr*) &client_info, (socklen_t*) &client_space);
   //Variables necesarias para probar la veracidad el comando que el cliente conectado introduce
   size_t found;
   string name;
   string need = "IDENTIFY ";
   char error[256] = "EL comando que introduciste es incorrecto vuelve a conectarde.. adios :V";
   while(1){
+    //Si hay conexion se acepta
+    client_socket = accept(server_socket,(struct sockaddr*) &client_info, (socklen_t*) &client_space);
     // Imprime el ip del cliente que entra
     getpeername(client_socket, (struct sockaddr*) &client_info, (socklen_t*) &client_space);
     cout<<"Cliente "<<inet_ntoa(client_info.sin_addr)<<":"<<ntohs(client_info.sin_port)<<"."<<"Entrando"<<endl;
@@ -91,9 +91,16 @@ int main(){
       break;
     }
     name = cadena.substr(found+9);
-    //guardamos el nuevo cliente si es que pasa la prueba del nombre
+    //guardamos el nuevo cliente en el diccionario si es que pasa la prueba del nombre
     temporal = newNode(client_socket, inet_ntoa(client_info.sin_addr),name);
-    list[name] = temporal;    
+    list[name] = temporal;
+    
+    pthread_t server_thread;
+    if (pthread_create(&server_thread, NULL, (void *)manager, (void *)temporal) != 0) {
+      perror("Error al crear el hilo!\n");
+      exit(EXIT_FAILURE);
+    }
+    
   }
   //Cerrar el servidor
   close(server_socket);
