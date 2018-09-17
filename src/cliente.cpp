@@ -12,6 +12,10 @@
 #include <string>
 #include <sstream>
 using namespace std;
+
+//Esta variable me permite terminar con los hilos de ejecucion del msg_receiver y msg_sender
+volatile sig_atomic_t flagy = 0;
+
 //Prototipos de funciones
 void msg_sender();
 void msg_receiver();
@@ -20,6 +24,8 @@ void prompt();
 
 //Esta variable almacenara al descriptor de archivo(File Descriptor) del  el cliente
 int client_socket;
+
+
 
 int main(){
   stringstream stream;
@@ -36,8 +42,6 @@ int main(){
   int client_space = sizeof(client_info);
   //Esta variable almacenar el estado de la conexion
   int connection_status;
-  //En este arreglo se guarda el mensaje del servidor
-  char server_response[10000];
   //Creamos el socket del cliente
   client_socket = socket(AF_INET,SOCK_STREAM,0);
   //Pedimos memoria al sistema para las estructuras del servidor y cliente
@@ -45,7 +49,7 @@ int main(){
   memset(&client_info,0,client_space);
   //Configuramos las estructura del servidor 
   server_info.sin_family = AF_INET;
-  server_info.sin_addr.s_addr = inet_addr("192.168.15.8");
+  server_info.sin_addr.s_addr = inet_addr("10.4.26.98");
   server_info.sin_port = htons(8080);
   
   connection_status =  connect(client_socket,(struct sockaddr *) &server_info,sizeof(server_info));
@@ -54,34 +58,26 @@ int main(){
     printf("El cliente no se pudo conectar");
 
   }
-  //Mensajes de prueba para comprobacion de los comandos
-  char name[1000] = {};
-  char incorrecto[1000] = "IDENTIFYMUTSKA";
-
-  while(1){
-  //Esta funcion recibe el mensaje del servidor y lo guarda en la variable server_response
-  recv(client_socket,&server_response,sizeof(server_response),0);
-  stream.str(server_response);
-  cadena  = stream.str();
-  
-  //Imprime el mensaje del servidor con la conversion de char[] al tipo string
-  cout<<"El servidor envia el siguiente mensaje: "<<cadena<<endl;
-  fgets(name, 500, stdin);
-  trimm(name, 500);
-
-  
-  //Mandando mensaje personalizado en tiempo real;
-  send(client_socket,name,sizeof(name),0);
-  recv(client_socket,&server_response,sizeof(server_response),0);
-  stream.str(server_response);
-  cadena  = stream.str();
-  cout<<"El servidor envia el siguiente mensaje: "<<cadena<<endl;  
-  cout<<"Quieres continuar el ciclo?(y/n): "<<endl;
-  cin>>flag;
-  if(flag == "n")
-    break;
+  //POR EL MOMENTO ELIMINANDO PARTE DE ESTE CODIGO, PUES SE PROBARAN LOS HILOS DE EJECUCION
+  pthread_t msg_receiver_thread;
+  if (pthread_create(&msg_receiver_thread, NULL, (void *) msg_receiver, NULL) != 0) {
+    printf ("Error al crea el hilo!\n");
+    exit(EXIT_FAILURE);
   }
-
+  pthread_t msg_sender_thread;
+  if (pthread_create(&msg_sender_thread, NULL, (void *) msg_sender, NULL) != 0) {
+    printf ("Eror al crear el hilo!\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  while (1) {
+    if(flagy) {
+      printf("\nTe has desconectado... :V\n");
+      break;
+    }
+  }
+  
+  
   //Cerramos el socket del cliente
   close(client_socket);
  
@@ -92,11 +88,13 @@ int main(){
 
 //Esta funcion se encarga de recibir msg del socket del cliente
 void msg_receiver() {
-  char message[1000] = {};
+  char message[250000] = {};
   int receive;
   while (1) {
     receive = recv(client_socket, message, 1000, 0);
     if (receive > 0) {
+      if(strlen(message) == 0)
+	continue;
       printf("\r%s\n", message);
       prompt();
     } else if (receive == 0) {
@@ -109,14 +107,12 @@ void msg_receiver() {
 
 //Esta funcion se encargar de mandar msg por parte del cliente
 void msg_sender() {
-  char message[500] = {};
+  char message[250000] = {};
   while (1) {
-    prompt();
     while (fgets(message, 500, stdin) != NULL) {
       trimm(message, 500);
       if (strlen(message) == 0) {
-	prompt();
-	cout<<"No escribiste nada";
+	break;
       } else {
 	break;
       }
