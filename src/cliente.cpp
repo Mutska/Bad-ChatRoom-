@@ -16,6 +16,7 @@ using namespace std;
 void msg_sender();
 void msg_receiver();
 void trimm(char *,int);
+void prompt();
 
 //Esta variable almacenara al descriptor de archivo(File Descriptor) del  el cliente
 int client_socket;
@@ -91,12 +92,13 @@ int main(){
 
 //Esta funcion se encarga de recibir msg del socket del cliente
 void msg_receiver() {
-  char receiveMessage[1000] = {};
+  char message[1000] = {};
   int receive;
   while (1) {
-    receive = recv(client_socket, receiveMessage, 1000, 0);
+    receive = recv(client_socket, message, 1000, 0);
     if (receive > 0) {
-      printf("\r%s\n", receiveMessage);
+      printf("\r%s\n", message);
+      prompt();
     } else if (receive == 0) {
       break;
     } else { 
@@ -109,9 +111,11 @@ void msg_receiver() {
 void msg_sender() {
   char message[500] = {};
   while (1) {
+    prompt();
     while (fgets(message, 500, stdin) != NULL) {
       trimm(message, 500);
       if (strlen(message) == 0) {
+	prompt();
 	cout<<"No escribiste nada";
       } else {
 	break;
@@ -132,4 +136,9 @@ void msg_sender() {
       }
     }
   }
-  
+
+//Esta funcion me permite cambiar el prompt de la terminal 
+void prompt(){
+  printf("\r%s", "$");
+  fflush(stdout);
+}
