@@ -109,6 +109,7 @@ void msg_receiver() {
 void msg_sender() {
   char message[250000] = {};
   while (1) {
+    prompt();
     while (fgets(message, 500, stdin) != NULL) {
       trimm(message, 500);
       if (strlen(message) == 0) {
