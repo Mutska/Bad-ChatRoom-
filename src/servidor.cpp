@@ -47,7 +47,7 @@ int main(){
   
   //Configuramos las estructura del servidor 
   server_info.sin_family = AF_INET;
-  server_info.sin_addr.s_addr = inet_addr("10.4.26.98");
+  server_info.sin_addr.s_addr = inet_addr("192.168.15.8");
   server_info.sin_port = htons(8080);
 
   //Hacemos un bind para reservar el puerto que pensamos ocupar para el servidor

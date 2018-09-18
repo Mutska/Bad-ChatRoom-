@@ -32,3 +32,51 @@ void send_to_all(std::map<std::string,Usuario*> list,Usuario* cliente,char buffe
 }
   
   
+//Funcion que se encargara de detectar el comando introducido
+int detect(std::string command){
+  int flag;
+  while(1){
+    if(command.find("IDENTIFY ") != std::string::npos){
+      flag = 1;
+      break;
+    }
+    if(command.find("STATUS") != std::string::npos){
+      flag = 2;
+      break;
+    }
+    if(command.find("USERS") != std::string::npos){
+      flag = 3;
+      break;
+    }
+    if(command.find("MESSAGE") != std::string::npos){
+      flag = 4;
+      break;
+    }
+    if(command.find("PUBLICMESSAGE ") != std::string::npos){
+      flag = 5;
+      break;
+    }
+    if(command.find("CREATEROOM ") != std::string::npos){
+      flag = 6;
+      break;
+    }
+    if(command.find("INVITE") != std::string::npos){
+      flag = 7;
+      break;
+    }
+    if(command.find("JOINROOM") != std::string::npos){
+      flag = 8;
+      break;
+    }
+    if(command.find("ROOMESSAGE") != std::string::npos){
+      flag = 9;
+      break;
+    }
+    if(command.find("DISCONNECT") != std::string::npos){
+      flag = 10;
+      break;
+    }
+    flag = 11;
+  }
+  return flag;
+}
