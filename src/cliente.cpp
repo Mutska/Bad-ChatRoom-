@@ -90,12 +90,18 @@ int main(){
 void msg_receiver() {
   char message[250000] = {};
   int receive;
+  string cadena;
+  stringstream stream;
   while (1) {
-    receive = recv(client_socket, message, 1000, 0);
+    cadena.clear();
+    memset(message,0,sizeof(message));
+    receive = recv(client_socket, message, 250000, 0);
     if (receive > 0) {
       if(strlen(message) == 0)
 	continue;
-      printf("\r%s\n", message);
+      stream.str(message);
+      cadena  = stream.str();
+      cout<<"\r"<<cadena<<"\n";
       prompt();
     } else if (receive == 0) {
       break;
