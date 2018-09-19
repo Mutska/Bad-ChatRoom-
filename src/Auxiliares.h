@@ -97,10 +97,10 @@ string send_arguments(int i, string comando){
     return name;
     break;
   case 2:
-    if(split[1] != "ACTIVE" || split[1] != "AWAY" || split[1] != "BUSY"){
-      return error;
-    }else{
+    if(split[1] == "ACTIVE" || split[1] == "AWAY" || split[1] == "BUSY"){
       return split[1];
+    }else{
+      return error;
     }
     break;
   case 4:
