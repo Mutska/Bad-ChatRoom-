@@ -1,5 +1,6 @@
 //Definicion de la clase Usuario
 #include <string>
+#include <unordered_map>
 #ifndef USUARIO_H
 #define USUARIO_H
 //Esta es la clase de la cual se creara cada cliente que entre a la comunicacion

@@ -154,6 +154,7 @@ int detect(string command){
 string send_arguments(int i, string comando){
   string name = "Ya tienes asignado un nombre";
   string message;
+  string roomname;
   int found;
   int len;
   istringstream iss(comando);
