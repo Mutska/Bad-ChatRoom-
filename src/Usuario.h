@@ -8,6 +8,8 @@ class Usuario{
   int data;
   char ip[16];
   std::string  name;
+  std::string status;
+  std::unordered_map<std::string,int> chatrooms;
  private:
   int nothing;
 
