@@ -49,8 +49,8 @@ int main(){
   memset(&client_info,0,client_space);
   //Configuramos las estructura del servidor 
   server_info.sin_family = AF_INET;
-  server_info.sin_addr.s_addr = inet_addr("192.168.15.8");
-  server_info.sin_port = htons(8080);
+  server_info.sin_addr.s_addr = inet_addr("127.0.0.1");
+  server_info.sin_port = htons(1234);
   
   connection_status =  connect(client_socket,(struct sockaddr *) &server_info,sizeof(server_info));
 
@@ -58,7 +58,6 @@ int main(){
     printf("El cliente no se pudo conectar");
 
   }
-  //POR EL MOMENTO ELIMINANDO PARTE DE ESTE CODIGO, PUES SE PROBARAN LOS HILOS DE EJECUCION
   pthread_t msg_receiver_thread;
   if (pthread_create(&msg_receiver_thread, NULL, (void *) msg_receiver, NULL) != 0) {
     printf ("Error al crea el hilo!\n");
@@ -72,7 +71,7 @@ int main(){
   
   while (1) {
     if(flagy) {
-      printf("\nTe has desconectado... :V\n");
+      cout<<"\nTe has desconectado"<<endl;
       break;
     }
   }
