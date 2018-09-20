@@ -155,7 +155,6 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
   stringstream stream;
   vector <string> case_seven;
     // Ciclo  que esta pendiente a las solicitudes del cliente, esta sera la funcion mas importante del servidor
-  int receive;
   while (1) {
     if (flag) {//si esta activada la bandera el servidor cierra
       break;
@@ -168,12 +167,9 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
       }
       cadena.clear();
       send_buffer.clear();
-      cout<<"LA CADENA EN EL PRINCIPIO DE LOS TIEMPOS  CONTIENE: ["<<send_buffer<<"]"<<endl;
       stream.str(recv_buffer);
       cadena  = stream.str();
       tam = cadena.size();
-      cout<<"El largo de la cadena es: "<<tam<<endl;
-      cout<<"La cadena recibida es la siguiente: "<<cadena<<endl;
       test = detect(cadena);
       cadena.erase(std::remove(cadena.begin(), cadena.end(), '\n'), cadena.end());
       if(test != std::string::npos){
@@ -182,10 +178,69 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
 	  send_buffer += "\n";
 	  
 	}
-	
-      }
+	if(test == 2){
+	  status  = send_arguments(2,cadena);
+	}
+	if(test == 3){
+	  send_buffer = show_users(list);
+	}
+	if(test == 4){
+	  send_buffer = cliente->name;
+	  send_buffer += " : ";
+	  send_buffer += send_arguments(4,cadena);
+	  send_buffer += "\n";
+	}
+	if(test == 5){
+	  send_buffer = "Mensaje privado de ";
+	  send_buffer += cliente->name;
+	  send_buffer += " : ";
+	  send_buffer += send_arguments(5,cadena);
+	  send_buffer += "\n";
+	  case_five = send_five_case(cadena);//CAMBIAR AL PUNTO G :V
+	  
+	}
+	if(test == 6){
+	  roomname = send_arguments(6,cadena);
+	  cliente->chatrooms[roomname] = 1;
+	  send_buffer = "Chatroom: ";
+	  send_buffer +=  roomname;
+	  send_buffer += " creado con exito\n";
+	}
+	if(test == 7){
+	  case_seven = send_seven_case(cadena);
+	  roomname = case_seven[1];
+	  send_buffer = "Se ha enviado la invitacion a los usuarios\n";
+	}
+	if(test == 8){
+	  roomname = send_arguments(8,cadena);
+	  unordered_map<string,int>::const_iterator verify = cliente->chatrooms.find(roomname);
+	  if(verify == cliente->chatrooms.end() ){
+	    send_buffer = "No has sido invitado a la sala\n";
+	  }else{
+	    cliente->chatrooms[roomname] = 2;
+	    send_buffer = "Has sido agregado exitosamente al chatroom: ";
+	    send_buffer += roomname;
+	    send_buffer += " \n";
+	  }
+	}
+	if(test == 9){
+	  // case_nine = send_nine_case(cadena);
+	  roomname = send_arguments(9,cadena);
+	  roomname_len = roomname.size();
+	  pivote = cadena.find(roomname);
+	  roomname_message = cadena.substr(pivote+roomname_len+1);
+	  send_buffer = "Mensaje enviado con exito a la sala: ";
+	  send_buffer += roomname;
+	  send_buffer += "\n";
+	}
+	if(test == 10){
+	  send_buffer = "Has decidido desconectarte amigo, nos vemos la proxima\n";
+	  }
+      }else{
+	test = 13;
+	send_buffer = "El comando que introduciste es incorrecto o su sintaxis esta mal\n";
+      }     
       
-
       
     } else if (receive == 0) {
       cout<<cliente->name<<"("<<cliente->ip<<")"<<"("<<cliente->data<<")"<<" dejo el chat"<<endl;
@@ -201,7 +256,53 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
       cout<<"Error :("<<endl;
       flag = 1;
     }
-    send_to_all(list,cliente, send_buffer);
+    if(test == 1){
+      send_to_one(list,cliente,send_buffer);
+    }
+    if(test == 2){
+      if(status == "ERROR"){
+	send_buffer = "El status que introduciste es incorrecto, trata de nuevo\n";
+	send_to_one(list,cliente,send_buffer);
+      }else{
+	cliente->status = status;
+	send_buffer = "Nuevo status: ";
+	send_buffer += status;
+	send_buffer += "\n";
+	send_to_one(list,cliente,send_buffer);
+      }
+      
+    }
+    if(test == 3){
+      send_to_one(list,cliente,send_buffer);
+    }
+    if(test == 4){
+      send_to_all(list,cliente, send_buffer);
+    }
+    if(test == 13){
+      send_to_one(list,cliente,send_buffer);
+    }
+    if(test == 5){
+      send_private_msg(list,cliente,send_buffer,case_five);
+    }
+    if(test == 6){
+      send_to_one(list,cliente,send_buffer);     
+    }
+    if(test == 7){
+      send_to_one(list,cliente,send_buffer);
+      send_invitation(list,cliente,case_seven,roomname);
+    }
+    if(test == 8){
+      send_to_one(list,cliente,send_buffer);
+    }
+    if(test == 9){
+      send_to_one(list,cliente,send_buffer);
+      send_to_room(list,cliente,roomname_message,roomname);
+    }
+    if(test == 10){
+      send_to_one(list,cliente,send_buffer);
+      break;
+    }
+    send_buffer.clear();    
   }
   // Cuando termina el cliente se cierra su "FILE DESCRIPTOR" y lo elimina del diccionario
   close(cliente->data);
