@@ -6,6 +6,7 @@ El chat fue escrito en C++ y python, dentro de la carpeta '/src' se encuentra el
 con sus archivos auxiliares, el cliente esta escrito en c++ pero sin interfaz gráfica, para esto se
 agrego dentro de '/src' la carpeta '/GUI client' que es un cliente simple escrito en python pero con
 interfaz gráfica integrada.
+Mutska(Marco Antonio Velasco Flores, 418004087)
 
 Dependencias
 
