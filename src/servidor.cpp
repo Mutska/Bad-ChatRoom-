@@ -28,7 +28,7 @@ int main(){
   //Esta variable me ayudara a hacer operaciones sobre los comandos recibidos
   string cadena;
   //Mensaje de prueba para enviar al cliente
-  char msg[10000] = "Identificate por favor";
+  char msg[10000] = "Bienvenido al servidor.  Identificate por favor ";
   char client_response[256000];
   stream.str(msg);
   cadena  = stream.str();
@@ -72,6 +72,8 @@ int main(){
   string need = "IDENTIFY ";
   char error[256] = "EL comando que introduciste es incorrecto vuelve a conectarde.. adios :V";
   int band = 0;
+  string send_notification;
+  size_t size;
   while(1){
     //Si hay conexion se acepta
     client_socket = accept(server_socket,(struct sockaddr*) &client_info, (socklen_t*) &client_space);
@@ -97,6 +99,11 @@ int main(){
 	if(isalpha(name[i]))
 	  real += name[i];	
       }
+      send_notification = "Te has conectado exitosamente ";
+      send_notification += real;
+      send_notification += "\n";
+      size = send_notification.size();
+      send(client_socket,send_notification.c_str(),size,0);
       cout<<"El cliente envio su nombre: "<<real<<endl;
       band = 0;
     }else if(found == std::string::npos){
@@ -118,8 +125,7 @@ int main(){
     }
     
   }
-  //Cerrar el servidor
-  close(client_socket);
+  get_out(1);
   close(server_socket);
   return 0;
 }
