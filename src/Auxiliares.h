@@ -30,7 +30,7 @@ void send_to_all(map<string,Usuario*> list,Usuario* cliente,string buffer){
   std::string ultimate = buffer;
   size_t tam = ultimate.size();
   for (map<string,Usuario*>::iterator it = list.begin(); it!=list.end(); ++it){
-    if((cliente->data == it->second->data) || (it->second->name == "Server")){
+    if(it->second->name == "Server"){
       continue;
     }
     send(it->second->data,ultimate.c_str(),tam,0);    
@@ -95,6 +95,7 @@ void send_to_room(map<string,Usuario*> list,Usuario* cliente,string  message,str
       send(it->second->data,room_message.c_str(),tam,0);
     }
   }
+  room_message.clear();
 }
 
 
@@ -126,7 +127,7 @@ int detect(string command){
       flag = 5;
       break;
     }
-    if(command.find("CREATEROOM ") != string::npos && command.size() > 12 ){
+    if(command.find("CREATEROOM ") != string::npos && command.size() > 11 ){
       flag = 6;
       break;
     }
@@ -134,7 +135,7 @@ int detect(string command){
       flag = 7;
       break;
     }
-    if(command.find("JOINROOM ") != string::npos && command.size() >  10){
+    if(command.find("JOINROOM ") != string::npos && command.size() >  9){
       flag = 8;
       break;
     }

@@ -142,7 +142,6 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
   Usuario *cliente = (Usuario *)client;
   int flag = 0;
   int test;
-  int tam;
   int pivote;
   int roomname_len;
   char recv_buffer[250000] = {};
@@ -169,26 +168,38 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
       send_buffer.clear();
       stream.str(recv_buffer);
       cadena  = stream.str();
-      tam = cadena.size();
       test = detect(cadena);
       cadena.erase(std::remove(cadena.begin(), cadena.end(), '\n'), cadena.end());
       if(test != std::string::npos){
 	if(test == 1){
 	  send_buffer = send_arguments(1,cadena);
 	  send_buffer += "\n";
+	  send_to_one(list,cliente,send_buffer);
 	  
 	}
 	if(test == 2){
 	  status  = send_arguments(2,cadena);
+	  if(status == "ERROR"){
+	    send_buffer = "El status que introduciste es incorrecto, trata de nuevo\n";
+	    send_to_one(list,cliente,send_buffer);
+	  }else{
+	    cliente->status = status;
+	    send_buffer = "Nuevo status: ";
+	    send_buffer += status;
+	    send_buffer += "\n";
+	    send_to_one(list,cliente,send_buffer);
+	  }
 	}
 	if(test == 3){
 	  send_buffer = show_users(list);
+	  send_to_one(list,cliente,send_buffer);
 	}
 	if(test == 4){
 	  send_buffer = cliente->name;
 	  send_buffer += " : ";
 	  send_buffer += send_arguments(4,cadena);
 	  send_buffer += "\n";
+	  send_to_all(list,cliente, send_buffer); 
 	}
 	if(test == 5){
 	  send_buffer = "Mensaje privado de ";
@@ -196,7 +207,8 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
 	  send_buffer += " : ";
 	  send_buffer += send_arguments(5,cadena);
 	  send_buffer += "\n";
-	  case_five = send_five_case(cadena);//CAMBIAR AL PUNTO G :V
+	  case_five = send_five_case(cadena);
+	  send_private_msg(list,cliente,send_buffer,case_five);
 	  
 	}
 	if(test == 6){
@@ -205,11 +217,14 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
 	  send_buffer = "Chatroom: ";
 	  send_buffer +=  roomname;
 	  send_buffer += " creado con exito\n";
+	  send_to_one(list,cliente,send_buffer);     
 	}
 	if(test == 7){
 	  case_seven = send_seven_case(cadena);
 	  roomname = case_seven[1];
 	  send_buffer = "Se ha enviado la invitacion a los usuarios\n";
+	  send_to_one(list,cliente,send_buffer);
+	  send_invitation(list,cliente,case_seven,roomname);
 	}
 	if(test == 8){
 	  roomname = send_arguments(8,cadena);
@@ -222,9 +237,9 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
 	    send_buffer += roomname;
 	    send_buffer += " \n";
 	  }
+	  send_to_one(list,cliente,send_buffer);
 	}
 	if(test == 9){
-	  // case_nine = send_nine_case(cadena);
 	  roomname = send_arguments(9,cadena);
 	  roomname_len = roomname.size();
 	  pivote = cadena.find(roomname);
@@ -232,75 +247,37 @@ void manager(void *client) {   //el parametro p_client es la direccion de p_clie
 	  send_buffer = "Mensaje enviado con exito a la sala: ";
 	  send_buffer += roomname;
 	  send_buffer += "\n";
+	  send_to_one(list,cliente,send_buffer);
+	  send_to_room(list,cliente,roomname_message,roomname);
 	}
 	if(test == 10){
 	  send_buffer = "Has decidido desconectarte amigo, nos vemos la proxima\n";
+	  send_to_one(list,cliente,send_buffer);
+	  send_buffer.clear();
+	  send_buffer = cliente->name;
+	  send_buffer += "(";
+	  send_buffer += cliente->ip;
+	  send_buffer += ") ";
+	  send_buffer += "dejo el chat\n";
+	  send_buffer += "\n";
+	  send_to_all(list,cliente, send_buffer);
+	  cout<<cliente->name<<"("<<cliente->ip<<")"<<"("<<cliente->data<<")"<<" dejo el chat"<<endl;
+	  break;
 	  }
       }else{
 	test = 13;
 	send_buffer = "El comando que introduciste es incorrecto o su sintaxis esta mal\n";
+	send_to_one(list,cliente,send_buffer);
       }     
       
       
     } else if (receive == 0) {
-      cout<<cliente->name<<"("<<cliente->ip<<")"<<"("<<cliente->data<<")"<<" dejo el chat"<<endl;
-      send_buffer = cliente->name;
-      send_buffer += "(";
-      send_buffer += cliente->ip;
-      send_buffer += ") ";
-      send_buffer += "dejo el chat\n";
-      send_buffer += "\n";
       flag = 1;
+      send_buffer.clear();
       
     } else {
       cout<<"Error :("<<endl;
       flag = 1;
-    }
-    if(test == 1){
-      send_to_one(list,cliente,send_buffer);
-    }
-    if(test == 2){
-      if(status == "ERROR"){
-	send_buffer = "El status que introduciste es incorrecto, trata de nuevo\n";
-	send_to_one(list,cliente,send_buffer);
-      }else{
-	cliente->status = status;
-	send_buffer = "Nuevo status: ";
-	send_buffer += status;
-	send_buffer += "\n";
-	send_to_one(list,cliente,send_buffer);
-      }
-      
-    }
-    if(test == 3){
-      send_to_one(list,cliente,send_buffer);
-    }
-    if(test == 4){
-      send_to_all(list,cliente, send_buffer);
-    }
-    if(test == 13){
-      send_to_one(list,cliente,send_buffer);
-    }
-    if(test == 5){
-      send_private_msg(list,cliente,send_buffer,case_five);
-    }
-    if(test == 6){
-      send_to_one(list,cliente,send_buffer);     
-    }
-    if(test == 7){
-      send_to_one(list,cliente,send_buffer);
-      send_invitation(list,cliente,case_seven,roomname);
-    }
-    if(test == 8){
-      send_to_one(list,cliente,send_buffer);
-    }
-    if(test == 9){
-      send_to_one(list,cliente,send_buffer);
-      send_to_room(list,cliente,roomname_message,roomname);
-    }
-    if(test == 10){
-      send_to_one(list,cliente,send_buffer);
-      break;
     }
     send_buffer.clear();    
   }
